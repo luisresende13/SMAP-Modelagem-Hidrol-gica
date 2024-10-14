@@ -1,0 +1,54 @@
+SUB ModeloSmapDiario
+INPUT ndias, Ad
+INPUT Str, K2t, Crec, Ai, Capc, Kkt
+INPUT Ep(i), Pr(i), Pcof
+Rsolo(0)=Tuin/100*Str
+Rsub(0)=Ebin/(1-.5^(1/Kkt))/Ad*86.4
+Rsup(0)=Supin/(1-.5^(1/K2t))/Ad*86.4
+Rsup2(0)=0.
+FOR I=1 TO ndias
+    P(i)= Pr(i)*Pcof
+    Tu(i)=Rsolo(i-1)/Str
+    
+    IF P(i) > Ai THEN
+        Es(i)=(P(i)-Ai)^2/(P(i)-Ai+Str-Rsolo(i-1))
+    ELSE
+        Es(i)=0
+    END IF
+    
+    IF (P(i)-Es(i))>Ep(i)*kep THEN
+        Er(i)=Ep(i)
+    ELSE
+        Er(i)=(P(i)-Es(i))+(Ep(i)-(P(i)-Es(i)))*Tu(i)
+    END IF
+    
+    IF Rsolo(i-1) > (Capc/100*Str) THEN
+        Rec(i)=Crec/100*Tu(i)*(Rsolo(i-1)-(Capc/100*Str))
+    ELSE
+        Rec(i)=0
+    END IF
+    
+    Rsolo(i)=Rsolo(i-1) + P(i)-Es(i)-Er(i)-Rec(i)
+    
+    IF Rsolo(i) > Str THEN
+        Es(i)=Es(i)+ Rsolo(i)-Str
+        Rsolo(i)= Str
+    END IF
+    
+    Ed(i)= Rsup(i-1)* (1-.5^(1/K2t))
+    Rsup(i)= Rsup(i-1) + Es(i) - Ed(i)
+    
+    IF Rsup(i)> H THEN
+        Emarg (i)= (Rsup(i)-H)* (1-.5^(1/K1t))
+        Rsup(i)=H
+    ELSE
+        Emarg(i)=0
+    END IF
+    
+    Ed2(i)=Rsup2(i-1)*(1-.5^(1/K3t))
+    Rsup2(i)=Rsup2(i-1) + Emarg(i)
+    Eb(i)= Rsub(i-1)*(1-.5^(1/Kkt))
+    Rsub(i)= Rsub (i-1) + Rec(i) – Eb(i)
+    Q(i)= (Ed(i)+Eb(i)+Ed2(i))*Ad/86.4
+
+NEXT i

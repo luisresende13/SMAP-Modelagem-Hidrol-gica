@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydrology Model Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* Example spinner animation (already included with Tailwind) */
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }        
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <div class="flex">
+        <!-- Main content (left side) -->
+        <div class="flex-grow p-6">
+            <h1 class="text-4xl font-bold text-center mb-8">Hydrology Model Dashboard</h1>
+
+            <!-- Metrics Table -->
+            <div class="overflow-x-auto mb-8">
+                <table class="table-auto w-full bg-white shadow-md rounded">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2">Metric</th>
+                            <th class="px-4 py-2">Base</th>
+                            <th class="px-4 py-2">ONS</th>
+                            <th class="px-4 py-2">Optimized</th>
+                        </tr>
+                    </thead>
+                    <tbody id="metrics-table">
+                        <!-- Rows populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Charts Section -->
+            <div id="charts-section" class="space-y-8">
+                <!-- Charts populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Sidebar (right side) -->
+        <div class="w-1/4 bg-white p-6 shadow-md" style="max-height: 100vh; overflow-y: auto;">
+            <!-- Date Fields -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4">Select Dates</h2>
+                <div class="flex flex-col gap-4">
+                    <div>
+                        <label for="start_date" class="block text-lg">Start Date:</label>
+                        <input id="start_date" type="date" class="border p-2 rounded w-full" value="1995-08-01">
+                    </div>
+                    <div>
+                        <label for="end_date" class="block text-lg">End Date:</label>
+                        <input id="end_date" type="date" class="border p-2 rounded w-full" value="2000-08-01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parameter Sliders -->
+            <div class="mb-8">
+                <div style="height: 100px; display: flex; flex-direction: row; align-items: center; justify-content: left;">
+                    <h2 class="text-xl font-semibold mb-4">Adjust Parameters</h2>
+                    
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class=" z-50 hidden mb-4 ml-4">
+                    <div class="animate-spin rounded-full h-4 w-4 border-t-4 border-b-4 border-blue-500"></div>
+                </div>
+                </div>
+                <div id="sliders" class="space-y-4">
+                    <!-- Slider Template -->
+                    <div>
+                        <label for="Str" class="block text-lg">Str (mm)</label>
+                        <input type="range" min="0" max="2000" value="1050" step="1" id="Str" class="w-full">
+                        <span id="Str_value" class="text-sm">1050</span>
+                    </div>
+                    <div>
+                        <label for="Kkt" class="block text-lg">Kkt (dia)</label>
+                        <input type="range" min="30" max="180" value="105" step="1" id="Kkt" class="w-full">
+                        <span id="Kkt_value" class="text-sm">105</span>
+                    </div>
+                    <div>
+                        <label for="Crec" class="block text-lg">Crec (%)</label>
+                        <input type="range" min="0" max="100" value="50" step="1" id="Crec" class="w-full">
+                        <span id="Crec_value" class="text-sm">50</span>
+                    </div>
+                    <div>
+                        <label for="K2t" class="block text-lg">K2t (dia)</label>
+                        <input type="range" min="0.2" max="10" value="5.0" step="0.1" id="K2t" class="w-full">
+                        <span id="K2t_value" class="text-sm">5.0</span>
+                    </div>
+                    <div>
+                        <label for="K1t" class="block text-lg">K1t (dia)</label>
+                        <input type="range" min="0.2" max="10" value="5.0" step="0.1" id="K1t" class="w-full">
+                        <span id="K1t_value" class="text-sm">5.0</span>
+                    </div>
+                    <div>
+                        <label for="Capc" class="block text-lg">Capc (%)</label>
+                        <input type="range" min="30" max="50" value="40" step="1" id="Capc" class="w-full">
+                        <span id="Capc_value" class="text-sm">40</span>
+                    </div>
+                    <div>
+                        <label for="H" class="block text-lg">H (mm)</label>
+                        <input type="range" min="0" max="300" value="150" step="1" id="H" class="w-full">
+                        <span id="H_value" class="text-sm">150</span>
+                    </div>
+                    <div>
+                        <label for="Ai" class="block text-lg">Ai (mm)</label>
+                        <input type="range" min="0" max="5" value="3.5" step="0.1" id="Ai" class="w-full">
+                        <span id="Ai_value" class="text-sm">3.5</span>
+                    </div>
+                    <div>
+                        <label for="kep" class="block text-lg">kep</label>
+                        <input type="range" min="0.8" max="1.2" value="1.0" step="0.01" id="kep" class="w-full">
+                        <span id="kep_value" class="text-sm">1.0</span>
+                    </div>
+                    <div>
+                        <label for="K3t" class="block text-lg">K3t (dia)</label>
+                        <input type="range" min="10" max="60" value="35" step="1" id="K3t" class="w-full">
+                        <span id="K3t_value" class="text-sm">35</span>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-4">Physical Settings</h4>
+                    <div>
+                        <label for="Ad" class="block text-lg">Ad (6279.0)</label>
+                        <input type="range" min="1000" max="10000" value="6279" step="1" id="Ad" class="w-full">
+                        <span id="Ad_value" class="text-sm">6279</span>
+                    </div>
+                    <div>
+                        <label for="Pcof" class="block text-lg">Pcof (1.0)</label>
+                        <input type="range" min="0" max="5" value="1.0" step="0.1" id="Pcof" class="w-full">
+                        <span id="Pcof_value" class="text-sm">1.0</span>
+                    </div>
+                    <div>
+                        <label for="Tuin" class="block text-lg">Tuin (20.0)</label>
+                        <input type="range" min="0" max="50" value="20.0" step="0.1" id="Tuin" class="w-full">
+                        <span id="Tuin_value" class="text-sm">20.0</span>
+                    </div>
+                    <div>
+                        <label for="Ebin" class="block text-lg">Ebin (45.0)</label>
+                        <input type="range" min="10" max="100" value="45.0" step="0.1" id="Ebin" class="w-full">
+                        <span id="Ebin_value" class="text-sm">45.0</span>
+                    </div>
+                    <div>
+                        <label for="Supin" class="block text-lg">Supin (1.0)</label>
+                        <input type="range" min="0" max="5" value="1.0" step="0.1" id="Supin" class="w-full">
+                        <span id="Supin_value" class="text-sm">1.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to show the loading spinner
+        function showSpinner() {
+            document.getElementById('loading-spinner').classList.remove('hidden');
+        }
+        
+        // Function to hide the loading spinner
+        function hideSpinner() {
+            document.getElementById('loading-spinner').classList.add('hidden');
+        }
+        
+        // Function to fetch metrics and update charts
+        async function fetchAndUpdateData() {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            showSpinner();
+            try {
+                const response = await fetch('http://localhost:5000/run_model', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        params: params,
+                        start_date: startDate,
+                        end_date: endDate
+                    })
+                });
+
+                if (!response.ok) throw new Error('Error fetching data');
+
+                const data = await response.json();
+                updateMetricsTable(data.stats);
+                updateCharts(data.charts);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                hideSpinner();
+            }
+        }
+
+// Store previous stats to compare
+let previousStats = null;
+
+// Update the metrics table
+function updateMetricsTable(stats) {
+    const metricsTable = document.getElementById('metrics-table');
+    metricsTable.innerHTML = ''; // Clear table first
+
+    const metrics = ['cef', 'cer', 'soma_coef', 'cc', 'me', 'mae', 'rmse_norm', 'rmse'];
+
+    metrics.forEach(metric => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td class="border px-4 py-2">${metric}</td>`;
+        
+        for (let i = 0; i < 3; i++) {
+            const currValue = stats[i][metric];
+            
+            let cellStyle = '';
+            if (previousStats) {
+                const prevValue = previousStats[i][metric];
+                if (currValue !== prevValue) {
+                    const backgroundColor = currValue < prevValue ? '#E8F5E9' : '#FFEBEE'; // Subtle green/red background
+                    cellStyle = `background-color:${backgroundColor}; transition: background-color 0.5s ease; border: 2px solid ${currValue < prevValue ? '#81C784' : '#E57373'};`; // Smooth transition and subtle border
+                }
+            }
+            
+            row.innerHTML += `
+                <td class="border px-4 py-2" style="${cellStyle}">${currValue.toFixed(3)}</td>
+            `;
+        }
+        metricsTable.appendChild(row);
+    });
+
+    previousStats = stats;
+}
+        // Update the charts section with the chart HTML and run the scripts
+        function updateCharts(charts) {
+            const chartsSection = document.getElementById('charts-section');
+            chartsSection.innerHTML = ''; // Clear previous charts
+        
+            charts.forEach(chart => {
+                const chartDiv = document.createElement('div');
+                chartDiv.innerHTML = chart;
+        
+                // Extract the script content
+                const scriptTags = chartDiv.getElementsByTagName('script');
+                
+                // Append chart HTML without <script> tags
+                chartsSection.appendChild(chartDiv);
+        
+                // Re-run the scripts
+                for (const script of scriptTags) {
+                    const newScript = document.createElement('script');
+                    newScript.type = 'text/javascript';
+                    if (script.src) {
+                        // If the script has a src attribute (external script), copy it
+                        newScript.src = script.src;
+                    } else {
+                        // Otherwise, copy its inline content
+                        newScript.textContent = script.textContent;
+                    }
+                    document.body.appendChild(newScript); // Append the new script to the body to execute
+                }
+            });
+        }
+
+        let timeoutId = null;
+        let params = {};
+
+        function onParameterUpdate(event) {
+            const param = event.target.id;
+            const value = event.target.value;
+            
+            document.getElementById(`${param}_value`).textContent = value;
+            params[param] = parseFloat(value);
+            console.log(`${param} = ${params[param]}`);
+            
+            if (timeoutId)
+                clearTimeout(timeoutId);
+
+            timeoutId = setTimeout(() => {
+                fetchAndUpdateData();
+            }, 500);
+            
+        }
+    
+        // Add event listeners to sliders to update values and parameters
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', onParameterUpdate);
+
+            const param = slider.id;
+            const value = slider.value;
+            
+            document.getElementById(`${param}_value`).textContent = value;
+            params[param] = parseFloat(value);
+            console.log(`${param} = ${params[param]}`);
+        });
+
+        // Initial load
+        fetchAndUpdateData();
+    </script>
+</body>
+</html>

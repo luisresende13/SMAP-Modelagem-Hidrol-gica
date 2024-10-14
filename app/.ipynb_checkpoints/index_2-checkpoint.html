@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMAP Model Calibration</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">SMAP Model Calibration</h1>
+        
+        <!-- Date Inputs -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="start_date" class="block text-gray-700">Start Date:</label>
+                <input type="date" id="start_date" class="border rounded p-2 w-full" value="2000-01-01">
+            </div>
+            <div>
+                <label for="end_date" class="block text-gray-700">End Date:</label>
+                <input type="date" id="end_date" class="border rounded p-2 w-full" value="2005-12-31">
+            </div>
+        </div>
+
+        <!-- Parameter Sliders -->
+        <h2 class="text-2xl font-semibold mb-4">Adjust Parameters</h2>
+        <div id="sliders" class="grid grid-cols-2 gap-4 mb-6">
+            <!-- Generate sliders dynamically -->
+        </div>
+
+        <!-- Metrics Table -->
+        <h2 class="text-2xl font-semibold mb-4">Model Metrics</h2>
+        <table class="min-w-full bg-white mb-6">
+            <thead class="bg-gray-800 text-white">
+                <tr>
+                    <th class="py-2 px-4">Metric</th>
+                    <th class="py-2 px-4">Base</th>
+                    <th class="py-2 px-4">ONS</th>
+                    <th class="py-2 px-4">Optimized</th>
+                </tr>
+            </thead>
+            <tbody id="metrics_table" class="text-gray-700">
+                <!-- Table rows will be dynamically populated -->
+            </tbody>
+        </table>
+
+        <!-- Charts Section -->
+        <h2 class="text-2xl font-semibold mb-4">Charts</h2>
+        <div id="charts-section" class="grid grid-cols-1 gap-4">
+            <!-- Charts will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Default parameter values
+        const defaultParams = {
+            Ad: 6279.0, Str: 100.0, K2t: 5.5, Crec: 100, Ai: 2, Capc: 42.0, Kkt: 150, 
+            Pcof: 1.0, Tuin: 20.0, Ebin: 45.0, Supin: 1.0, kep: 1.05153505864843, 
+            H: 200.0, K1t: 10.0, K3t: 10.0
+        };
+
+        // Render sliders dynamically
+        const renderSliders = (params) => {
+            const slidersContainer = document.getElementById('sliders');
+            slidersContainer.innerHTML = '';
+
+            for (const [param, value] of Object.entries(params)) {
+                slidersContainer.innerHTML += `
+                    <div>
+                        <label class="block text-gray-700">${param}: <span id="${param}_value">${value}</span></label>
+                        <input type="range" id="${param}" class="w-full" min="${value * 0.5}" max="${value * 1.5}" 
+                               value="${value}" step="0.01" oninput="updateParam('${param}', this.value)">
+                    </div>`;
+            }
+        };
+
+        // Update parameter value display
+        const updateParam = (param, value) => {
+            document.getElementById(`${param}_value`).textContent = value;
+            params[param] = parseFloat(value);
+            fetchAndUpdate();
+        };
+
+        // Initialize parameters
+        let params = { ...defaultParams };
+        renderSliders(params);
+
+        // Fetch and update data
+        const fetchAndUpdate = async () => {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            try {
+                const response = await axios.post('http://127.0.0.1:5000/run_model', {
+                    params, start_date: startDate, end_date: endDate
+                });
+
+                const { stats, charts } = response.data;
+
+                // Update metrics table
+                const metricsTable = document.getElementById('metrics_table');
+                metricsTable.innerHTML = '';  // Clear table
+                const metricNames = ['cef', 'cer', 'soma_coef', 'cc', 'me', 'rmse_norm', 'rmse'];
+                metricNames.forEach((metric, idx) => {
+                    metricsTable.innerHTML += `
+                        <tr>
+                            <td class="border py-2 px-4">${metric.toUpperCase()}</td>
+                            <td class="border py-2 px-4">${stats[0][metric].toFixed(4)}</td>
+                            <td class="border py-2 px-4">${stats[1][metric].toFixed(4)}</td>
+                            <td class="border py-2 px-4">${stats[2][metric].toFixed(4)}</td>
+                        </tr>`;
+                });
+
+                // Update charts
+                updateCharts(charts)
+                // const chartContainer = document.getElementById('chart-section');
+                // chartContainer.innerHTML = charts.join('');  // Insert chart HTML
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+// Update the charts section with the chart HTML and run the scripts
+function updateCharts(charts) {
+    const chartsSection = document.getElementById('charts-section');
+    chartsSection.innerHTML = ''; // Clear previous charts
+
+    charts.forEach(chart => {
+        const chartDiv = document.createElement('div');
+        chartDiv.innerHTML = chart;
+
+        // Extract the script content
+        const scriptTags = chartDiv.getElementsByTagName('script');
+        
+        // Append chart HTML without <script> tags
+        chartsSection.appendChild(chartDiv);
+
+        // Re-run the scripts
+        for (const script of scriptTags) {
+            const newScript = document.createElement('script');
+            newScript.type = 'text/javascript';
+            if (script.src) {
+                // If the script has a src attribute (external script), copy it
+                newScript.src = script.src;
+            } else {
+                // Otherwise, copy its inline content
+                newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript); // Append the new script to the body to execute
+        }
+    });
+}
+
+        // Initial fetch
+        fetchAndUpdate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+Trabalho 1 – SMAP – Em síntese, há três fases no trabalho.
+
+ 
+
+A primeira fase trata da implementação do modelo SMAP no nível diário.
+
+ 
+
+O segundo passo é fazer uma análise de sensibilidade dos parâmetros com vistas a fazer a calibração do modelo. 
+
+ 
+
+Nesta etapa, vocês podem, também, explorar a análise gráfica de comportamento das séries geradas (ou simuladas) de vazão face aos valores observados. 
+
+ 
+
+Quanto à calibração, a proposta é que vocês partam de um ponto inicial com valores dos parâmetros atribuídos no meio do intervalo da faixa de validade (pegar os extremos e dividir por 2). Essa situação reflete o fato de se ignorar qualquer informação adicional sobre o comportamento físico da bacia. 
+
+ 
+
+Apenas para perceberem a situação do que está em jogo no processo de calibração, contrastem o cenário com o valor de parâmetros ótimos obtidos pela ONS (vazão observada e vazão gerada ao longo do tempo do registro) versus o cenário quando vocês atribuem o valor médio para cada um dos parâmetros. 
+    
+ 
+
+Nesta análise gráfica, vocês podem plotar as séries ao longo do tempo, séries acumuladas ao longo do tempo, curva de permanência para ambos os registros de vazão observada e vazão gerada, gráfico de dispersão (vazão gerada - eixo y versus vazão observada - eixo x)  e gráfico de resíduos para observarem onde o modelo superestima ao longo do tempo e onde subestima ao se comparar com a série de vazões observadas. Algumas estatísticas para resumir esta parte gráfica podem ser utilizadas para compor com os gráficos. Na dissertação do Rafael Di Bello (2005), há algumas estatísticas que podem ser utilizadas para comparação numérica.
+
+ 
+
+Outra análise gráfica complementar, nos moldes do que o Rafael Carneiro Di Bello realizou, é desenvolver fazer o gráfico do estado de umidade do solo ao longo do tempo (zona vadosa do solo). Se tivéssemos a umidade do solo (ou algum outro indicador de referência) para a bacia, poderíamos também usar para efeito de análise. Similar análise pode ser feita para a variação dos níveis dos reservatórios superficial e subterrâneo. 
+
+ 
+
+Nessa parte exploratória, vocês podem examinar os balanços no nível anual da equação de balanço (P , E e Q). Em um balanço de longo curso (ano), uma hipótese seria considerar que valeria a seguinte equação P=E+Q. Os dados fornecidos são razoavelmente equilibrados no caso? 
+
+ 
+
+Na terceira fase (ver comentário mais abaixo), gráficos propostos nesta segunda fase bem como exame dos balanços de longo curso para P, E e Q podem ser efetuados. Dados mais bem consistidos e equilibrados podem permitir um melhor trabalho de modelagem em termos de calibração e validação. Estudos de previsão dependem de bons estudos de calibração e validação do modelo. 
+
+ 
+
+Foram também disponibilizados dados de outros anos para a bacia de Camargos, de forma que possam validar o conjunto de parâmetros que vocês encontraram na segunda fase, onde se propôs o procedimento de calibração dos parâmetros. Usar as colunas B, C e W para poder fazer a validação com os parâmetros obtidos mediante a geração da vazão calculada para os novos períodos de dados fornecidos.
+
+ 
+
+Estabelecido e explorado esse arcabouço de modelagem e análise, para enfatizar, lembrem que, na segunda fase do trabalho,  o passo efetivo de calibração consistiria, então, em, partindo do ponto inicial (meio do intervalo) chegar a um conjunto ótimo de parâmetros, que deve vir a ser distinto do que o ONS chegou para conjunto ótimo (aquele conjunto que vocês estão utilizando para fazer a implementação do modelo na fase 1).
+
+ 
+
+ Lembrem-se que o ONS empregou um outro conjunto distinto de dados, que foi  disponibilizado para vocês (outros anos diferentes, além do período 1995/1996 ) que pode ser empregado após a segunda fase ser concluída. Consistirá na fase, então, de validação (terceira fase). 
+
+ 
+
+Reparem que, no processo de calibração manual, poderão entender melhor como um dado parâmetro atua no processo de simulação da vazão na bacia em estudo. Podem fazer uma análise crítica sobre quais os parâmetros mais relevantes e quais os menos relevantes. 
+
+ 
+
+Coloquem-se no lugar de uma pessoa que vai usar o SMAP pela primeira vez: quais as recomendações vocês dariam para que essa pessoa fizesse um processo de calibração manual em relativamente poucos passos e chegasse a um bom resultado? Haveria alguma recomendação de vocês para um novo usuário? 
+
+
+
+Pode-se, ainda, tentar, no caso da planilha, explorar o uso do solver para realizar uma calibração automática. No caso de código computacional, pode ser avaliada a inclusão acoplada de uma rotina de otimização automática.
+
+ 
+
+No relato sobre o trabalho, essa informação pode ser disposta segundo uma construção científica (nos moldes do texto da dissertação do Rafael), ou seja, - Introdução, Fundamentação Teórica e Revisão Bibliográfica, Metodologia. Estudo de Caso, Resultados, Conclusões e Recomendações, Referências Bibliográficas. 
+
+ 
+
+Como mencionado previamente, um bom trabalho na fase 2 sugere maiores chances de sucesso na terceira fase (de validação), ou seja, um bom trabalho de representação de outros dias, meses e anos da série. 
+
+ 
+
+Em síntese, foi estabelecido um percurso para que vocês possam seguir no Trabalho 1.
